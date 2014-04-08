@@ -31,17 +31,20 @@ module TNSPayments
     #
     # Returns a Response object.
     def purchase transaction, token
-      transaction    = Transaction.new transaction
+      _purchase Transaction.new(transaction), token
+    end
+
+    def _purchase transaction, token
       order_id       = transaction.order_id
       transaction_id = transaction.transaction_id
       params         = {
         'apiOperation' => 'PAY',
-        'cardDetails'  => card_details(token),
-        'order'        => {'reference' => transaction.reference},
+        'sourceOfFunds'  => {
+          type: 'CARD',
+        }.merge(card_details(token)),
         'transaction'  => {
           'amount'    => transaction.amount.to_s,
           'currency'  => transaction.currency,
-          'reference' => transaction.reference.to_s
         }
       }
 
